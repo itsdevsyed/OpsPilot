@@ -1,0 +1,11 @@
+namespace: prod
+runtime: podman
+containers:
+  - name: opspilot_backend_1
+    image: localhost/opspilot_backend:latest
+    status: running
+    role: api
+  - name: opspilot_kafka_1
+    image: apache/kafka:4.0.1
+    status: running
+    role: message-broker
