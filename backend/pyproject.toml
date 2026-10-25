@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "itsdevsyed", email = "shoaib.syed4@outlook.com" }
 ]
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 dependencies = [
     "aiokafka>=0.14.0",
     "fastapi>=0.141.1",

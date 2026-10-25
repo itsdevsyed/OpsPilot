@@ -17,18 +17,43 @@ logging.basicConfig(
 )
 
 
+from fastapi.middleware.cors import CORSMiddleware
+
+logger = logging.getLogger(__name__)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    init_db()
-    await kafka_consumer.start()
+    try:
+        init_db()
+    except Exception as exc:
+        logger.warning("Database initialization deferred: %s", exc)
+
+    try:
+        await kafka_consumer.start()
+    except Exception as exc:
+        logger.warning("Kafka consumer could not be started (is Kafka broker running?): %s", exc)
+
     yield
-    await kafka_consumer.stop()
+
+    try:
+        await kafka_consumer.stop()
+    except Exception as exc:
+        logger.warning("Kafka consumer stop error: %s", exc)
 
 
 app = FastAPI(
     title="OpsPilot AI",
     version="1.0.0",
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(chat_router, prefix="/api")
